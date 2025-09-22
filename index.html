@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Oscilloscope — Entraînement</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+    <div class="app">
+        <!-- PANNEAU ENTRAÎNEMENT -->
+        <aside class="sidebar">
+            <form class="sidepanel training" id="training" autocomplete="off">
+                <h2>Entraînement</h2>
+
+                <!-- Boutons de difficulté = génèrent directement un nouvel exercice -->
+                <div class="segmented" id="diffGroup" aria-label="Difficulté">
+                    <button type="button" class="seg active" data-level="easy">Easy</button>
+                    <button type="button" class="seg" data-level="medium">Medium</button>
+                    <button type="button" class="seg" data-level="hard">Hard</button>
+                </div>
+
+                <!-- (Tolérance supprimée de l’UI; fixée à 5% en interne) -->
+
+                <div class="grid-answers" id="answers"></div>
+
+                <div class="row">
+                    <!-- Plus de bouton Générer ; la difficulté lance l’exercice -->
+                    <button type="button" id="btnValidate" disabled>Valider</button>
+                    <button type="button" id="btnExport">Exporter PNG</button>
+                </div>
+
+                <p id="feedback" class="feedback" aria-live="polite"></p>
+                <p id="solution" class="solution" aria-live="polite"></p>
+            </form>
+        </aside>
+
+        <!-- OSCILLOSCOPE -->
+        <div class="wrap">
+            <div class="scope" id="scope">
+                <img id="bg" src="Oscilloscope.png" alt="Oscilloscope pédagogique" />
+                <canvas id="trace" width="800" height="600" aria-hidden="true"></canvas>
+
+                <!-- Bouton de décalage horizontal (drag) -->
+                <div id="hShift" class="hshift" title="Décalage horizontal (glisser)"></div>
+
+                <!-- Knobs -->
+                <div class="knob" id="knobV" aria-label="V/div">
+                    <div class="value" id="vdivVal">1 V/div</div>
+                    <div class="needle" id="vNeedle"></div>
+                    <div class="cap"></div>
+                </div>
+                <div class="knob" id="knobT" aria-label="sec/div">
+                    <div class="value" id="tdivVal">2 ms/div</div>
+                    <div class="needle" id="tNeedle"></div>
+                    <div class="cap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./script.js" defer></script>
+</body>
+
+</html>
