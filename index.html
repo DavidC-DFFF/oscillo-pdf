@@ -1,67 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Oscilloscope — Entraînement</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Générateur de banques d’oscillogrammes</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-    <div class="app">
-        <!-- PANNEAU ENTRAÎNEMENT -->
-        <aside class="sidebar">
-            <form class="sidepanel training" id="training" autocomplete="off">
-                <h2>Entraînement</h2>
+    <main class="app">
+        <section class="panel" aria-labelledby="title">
+            <p class="eyebrow">Outil enseignant</p>
+            <h1 id="title">Banques d’oscillogrammes</h1>
+            <p class="intro">Générez des séries reproductibles de PNG, classées par difficulté, accompagnées d’un inventaire CSV.</p>
 
-                <!-- Boutons de difficulté = génèrent directement un nouvel exercice -->
-                <div class="segmented" id="diffGroup" aria-label="Difficulté">
-                    <button type="button" class="seg active" data-level="easy">Easy</button>
-                    <button type="button" class="seg" data-level="medium">Medium</button>
-                    <button type="button" class="seg" data-level="hard">Hard</button>
+            <form id="generatorForm">
+                <div class="counts">
+                    <label class="count easy">
+                        <span>Easy</span>
+                        <small>Valeurs entières, sans composante continue</small>
+                        <input id="easyCount" type="number" min="0" max="500" value="50" required>
+                    </label>
+                    <label class="count medium">
+                        <span>Medium</span>
+                        <small>Demi-divisions, décalage simple possible</small>
+                        <input id="mediumCount" type="number" min="0" max="500" value="100" required>
+                    </label>
+                    <label class="count hard">
+                        <span>Hard</span>
+                        <small>Demi-divisions, Umoy non nulle et phase décalée</small>
+                        <input id="hardCount" type="number" min="0" max="500" value="50" required>
+                    </label>
                 </div>
 
-                <!-- (Tolérance supprimée de l’UI; fixée à 5% en interne) -->
+                <label class="seed-field">
+                    <span>Graine de la banque</span>
+                    <input id="seed" type="text" value="OSCILLO-2026" maxlength="80" required>
+                    <small>La même graine et les mêmes quantités reproduisent exactement la même banque.</small>
+                </label>
 
-                <div class="grid-answers" id="answers"></div>
-
-                <div class="row">
-                    <!-- Plus de bouton Générer ; la difficulté lance l’exercice -->
-                    <button type="button" id="btnValidate" disabled>Valider</button>
-                    <button type="button" id="btnExport">Exporter PNG</button>
-                </div>
-
-                <p id="feedback" class="feedback" aria-live="polite"></p>
-                <p id="solution" class="solution" aria-live="polite"></p>
+                <button id="generateButton" type="submit">Générer le ZIP</button>
             </form>
-        </aside>
 
-        <!-- OSCILLOSCOPE -->
-        <div class="wrap">
-            <div class="scope" id="scope">
-                <img id="bg" src="Oscilloscope.png" alt="Oscilloscope pédagogique" />
-                <canvas id="trace" width="800" height="600" aria-hidden="true"></canvas>
-
-                <!-- Bouton de décalage horizontal (drag) -->
-                <div id="hShift" class="hshift" title="Décalage horizontal (glisser)"></div>
-
-                <!-- Knobs -->
-                <div class="knob" id="knobV" aria-label="V/div">
-                    <div class="value" id="vdivVal">1 V/div</div>
-                    <div class="needle" id="vNeedle"></div>
-                    <div class="cap"></div>
+            <div id="progressArea" class="progress-area" hidden>
+                <div class="progress-copy">
+                    <strong id="progressLabel">Préparation…</strong>
+                    <span id="progressValue">0 / 200</span>
                 </div>
-                <div class="knob" id="knobT" aria-label="sec/div">
-                    <div class="value" id="tdivVal">2 ms/div</div>
-                    <div class="needle" id="tNeedle"></div>
-                    <div class="cap"></div>
-                </div>
+                <progress id="progress" value="0" max="200"></progress>
             </div>
-        </div>
-    </div>
 
-    <script src="./script.js" defer></script>
+            <p id="status" class="status" role="status" aria-live="polite"></p>
+            <p class="note">Aucune donnée n’est envoyée sur Internet. La génération s’effectue entièrement dans le navigateur.</p>
+        </section>
+
+        <section class="preview-panel" aria-labelledby="previewTitle">
+            <div class="preview-heading">
+                <div>
+                    <p class="eyebrow">Aperçu</p>
+                    <h2 id="previewTitle">Exemple de sortie</h2>
+                </div>
+                <button id="refreshPreview" class="secondary" type="button">Nouvel aperçu</button>
+            </div>
+            <canvas id="preview" width="1300" height="896" aria-label="Aperçu d’un oscillogramme"></canvas>
+            <dl id="previewData" class="preview-data"></dl>
+        </section>
+    </main>
+
+    <img id="oscilloscopeImage" src="Oscilloscope.png" alt="" hidden>
+    <script src="script.js" defer></script>
 </body>
-
 </html>
