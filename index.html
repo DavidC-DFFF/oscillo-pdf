@@ -4,17 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Générateur de banques d’oscillogrammes</title>
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
     <main class="app">
         <section class="panel" aria-labelledby="title">
             <p class="eyebrow">Outil enseignant</p>
             <h1 id="title">Banques d’oscillogrammes</h1>
-            <p class="intro">Générez des séries reproductibles de PNG, classées par difficulté, accompagnées d’un inventaire CSV.</p>
+            <p class="intro">Générez des banques de sinus, triangles et carrés avec leurs WebP légers, corrigés et questions Moodle.</p>
 
             <form id="generatorForm">
-                <div class="counts">
+                <fieldset class="signal-group">
+                    <legend>Sinus</legend>
+                    <div class="counts">
                     <label class="count easy">
                         <span>Easy</span>
                         <small>Valeurs entières, sans composante continue</small>
@@ -27,10 +29,29 @@
                     </label>
                     <label class="count hard">
                         <span>Hard</span>
-                        <small>Demi-divisions, Umoy non nulle et phase décalée</small>
+                        <small>Graduations de 1/5 div. et Umoy non nulle</small>
                         <input id="hardCount" type="number" min="0" max="500" value="50" required>
                     </label>
-                </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="signal-group">
+                    <legend>Triangles</legend>
+                    <div class="counts">
+                        <label class="count easy"><span>Easy</span><small>Divisions entières, moyenne nulle</small><input id="triangleEasyCount" type="number" min="0" max="500" value="0" required></label>
+                        <label class="count medium"><span>Medium</span><small>Demi-divisions, moyenne simple possible</small><input id="triangleMediumCount" type="number" min="0" max="500" value="0" required></label>
+                        <label class="count hard"><span>Hard</span><small>Graduations de 1/5 div. et moyenne non nulle</small><input id="triangleHardCount" type="number" min="0" max="500" value="0" required></label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="signal-group">
+                    <legend>Carrés</legend>
+                    <div class="counts">
+                        <label class="count easy"><span>Easy</span><small>Plateaux symétriques, D = 50 %</small><input id="carreEasyCount" type="number" min="0" max="500" value="0" required></label>
+                        <label class="count medium"><span>Medium</span><small>Plateaux symétriques, D = 25, 50 ou 75 %</small><input id="carreMediumCount" type="number" min="0" max="500" value="0" required></label>
+                        <label class="count hard"><span>Hard</span><small>Plateaux symétriques, 1/5 div., D = 20 à 80 %</small><input id="carreHardCount" type="number" min="0" max="500" value="0" required></label>
+                    </div>
+                </fieldset>
 
                 <label class="seed-field">
                     <span>Graine de la banque</span>
@@ -38,7 +59,13 @@
                     <small>La même graine et les mêmes quantités reproduisent exactement la même banque.</small>
                 </label>
 
-                <button id="generateButton" type="submit">Générer le ZIP</button>
+                <label class="export-choice">
+                    <input id="includePng" type="checkbox">
+                    <span>Inclure aussi les PNG dans l’archive</span>
+                </label>
+                <p class="export-help">Les WebP sont toujours fournis et intégrés aux questions Moodle. Laissez cette case décochée pour une archive légère.</p>
+
+                <button id="generateButton" type="submit">Générer l’archive</button>
             </form>
 
             <div id="progressArea" class="progress-area" hidden>
@@ -50,7 +77,7 @@
             </div>
 
             <p id="status" class="status" role="status" aria-live="polite"></p>
-            <p class="note">Aucune donnée n’est envoyée sur Internet. La génération s’effectue entièrement dans le navigateur.</p>
+            <p class="note">Aucune donnée n’est envoyée sur Internet. L’archive contient les WebP de 900 px, le corrigé, l’inventaire et les banques Moodle ; les PNG de 900 px sont facultatifs.</p>
         </section>
 
         <section class="preview-panel" aria-labelledby="previewTitle">
@@ -59,7 +86,17 @@
                     <p class="eyebrow">Aperçu</p>
                     <h2 id="previewTitle">Exemple de sortie</h2>
                 </div>
-                <button id="refreshPreview" class="secondary" type="button">Nouvel aperçu</button>
+            </div>
+            <fieldset class="preview-level">
+                <legend>Niveau de l’aperçu</legend>
+                <label><input type="radio" name="previewLevel" value="easy" checked>Easy</label>
+                <label><input type="radio" name="previewLevel" value="medium">Medium</label>
+                <label><input type="radio" name="previewLevel" value="hard">Hard</label>
+            </fieldset>
+            <div class="preview-actions">
+                <button class="secondary" type="button" data-preview-wave="sinus">Générer un sinus</button>
+                <button class="secondary" type="button" data-preview-wave="triangle">Générer un triangle</button>
+                <button class="secondary" type="button" data-preview-wave="carre">Générer un carré</button>
             </div>
             <canvas id="preview" width="1300" height="896" aria-label="Aperçu d’un oscillogramme"></canvas>
             <dl id="previewData" class="preview-data"></dl>
@@ -67,6 +104,6 @@
     </main>
 
     <img id="oscilloscopeImage" src="Oscilloscope.png" alt="" hidden>
-    <script src="script.js?v=2" defer></script>
+    <script src="script.js?v=12" defer></script>
 </body>
 </html>
