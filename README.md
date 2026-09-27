@@ -22,7 +22,7 @@ Les quantités restent modifiables dans l’interface.
 Tous les signaux sont maintenus entièrement visibles.
 Le début de chaque période est aligné sur la première ligne verticale du quadrillage utile, et non sur le bord physique de l’écran : passage montant par la valeur moyenne pour les sinus et triangles, front montant pour les carrés. La période occupe toujours entre 5 et 10 divisions horizontales, ce qui affiche entre une et deux périodes à l’écran.
 Une ligne rouge matérialise la valeur moyenne des sinus et triangles lorsqu’elle est non nulle. Elle n’apparaît pas pour les carrés.
-Le calibre vertical est automatiquement affiné autant que possible : les deux crêtes restent dans les 8 divisions de l’écran et les lectures conservent des divisions entières en Easy, des demi-divisions en Medium et des cinquièmes de division en Hard.
+Le calibre vertical est automatiquement affiné autant que possible : les deux crêtes restent dans les 8 divisions de l’écran et les lectures conservent des divisions entières en Easy, des demi-divisions en Medium et des cinquièmes de division en Hard. Pour les sinus et triangles, les candidats dont le sommet est nul ou négatif sont écartés : `Umax` reste strictement positif.
 Pour les carrés, les deux plateaux restent à au moins une demi-division des bords supérieur et inférieur. La période repérée commence à la première division verticale et se termine au plus tard au début de la dernière. Le tracé périodique se prolonge jusqu’aux deux bords de la grille, avec un trait légèrement plus épais pour le distinguer du quadrillage.
 
 ## Utilisation
@@ -54,7 +54,7 @@ Lorsque des triangles ou carrés sont demandés, leurs images sont placées dans
 
 Les CSV UTF-8, séparés par des points-virgules, indiquent le type de signal. L’inventaire contient notamment `Umax`, `T`, `f`, les calibres et les valeurs en divisions ; pour les carrés, il ajoute `Th` et `D`. La case `Umoy` reste vide pour ces derniers. `corrige.csv` associe chaque identifiant aux quatre valeurs à relever. La fréquence est calculée par `f = 1/T` et écrite avec 15 chiffres significatifs quand son développement décimal n’est pas fini.
 
-Chaque question Moodle comporte quatre réponses numériques selon le type de signal. Les unités sont imposées dans l’énoncé et ne doivent pas être saisies. Le point et la virgule sont acceptés. La tolérance est de ±5 %, avec une tolérance absolue de 0,1 division lorsque `Umax = 0` ou `Umoy = 0`.
+Chaque question Moodle comporte quatre réponses numériques selon le type de signal. Les unités sont imposées dans l’énoncé et ne doivent pas être saisies. Le point et la virgule sont acceptés. La tolérance est de ±5 %, avec une tolérance absolue de 0,1 division lorsque `Umoy = 0`.
 
 ## Technique
 

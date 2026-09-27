@@ -155,6 +155,25 @@ test("triangles et carrés gardent leurs contraintes dans les trois niveaux", ()
   assert.ok(generated.some(item => item.level === "hard" && Math.abs(item.ad * 2 - Math.round(item.ad * 2)) > 1e-9), "Hard n’utilise jamais les cinquièmes non entiers ou demi-entiers");
 });
 
+test("la banque 200TRI produit 250 triangles avec un Umax positif", () => {
+  const generated = evaluate(`(() => {
+    const rows = [];
+    for (const [level, count] of [["easy", 100], ["medium", 100], ["hard", 50]]) {
+      const used = new Set();
+      for (let index = 1; index <= count; index++) {
+        const item = exercise(level, "200TRI", index, used, "triangle");
+        validateExercise(item);
+        rows.push(item);
+      }
+    }
+    return rows;
+  })()`);
+
+  assert.equal(generated.length, 250);
+  for (const item of generated) assert.ok(item.umax > 0, `${item.seed}: Umax non positif`);
+  assert.notEqual(generated.filter(item => item.level === "hard")[36].seed, "200TRI|triangle|hard|37|0");
+});
+
 test("un signal de 3 V centré sur -1 V passe de 2 à 1 V/div", () => {
   const scaled = evaluate('maximizeVertical("hard", 1, 1.5, -0.5)');
   assert.equal(scaled.vd, 1);
@@ -167,11 +186,11 @@ test("un signal de 3 V centré sur -1 V passe de 2 à 1 V/div", () => {
 test("le calibre vertical est optimal sans rogner le signal ni changer sa valeur", () => {
   const generated = evaluate(`(() => {
     const rows = [];
-    for (const level of ["easy", "medium", "hard"]) {
+    for (const wave of ["sinus", "triangle"]) for (const level of ["easy", "medium", "hard"]) {
       for (let bank = 0; bank < 20; bank++) {
         const used = new Set();
         for (let index = 1; index <= 50; index++) {
-          const item = exercise(level, "VERTICAL-" + bank, index, used);
+          const item = exercise(level, "VERTICAL-" + bank, index, used, wave);
           rows.push({ level, vi: item.vi, vd: item.vd, ad: item.ad, od: item.od, um: item.um, umoy: item.umoy, umax: item.umax });
         }
       }
@@ -181,6 +200,7 @@ test("le calibre vertical est optimal sans rogner le signal ni changer sa valeur
 
   for (const item of generated.rows) {
     const step = item.level === "easy" ? 1 : item.level === "medium" ? 0.5 : 0.2;
+    assert.ok(item.umax > 0, `${item.level}: maximum non positif`);
     assert.ok(Math.abs(item.od) + item.ad <= 4 + 1e-9, `${item.level}: courbe rognée`);
     assert.ok(Math.abs(item.ad * item.vd - item.um) < 1e-9, "amplitude modifiée");
     assert.ok(Math.abs(item.od * item.vd - item.umoy) < 1e-9, "valeur moyenne modifiée");
@@ -294,6 +314,8 @@ test("une incohérence sur une réponse empêche l’export", () => {
   context.invalidRow = { ...source, f: source.f * 1.1 };
   assert.throws(() => vm.runInContext("validateExercise(invalidRow)", context), /Valeurs incohérentes/);
   context.invalidRow = { ...source, umax: source.umax + source.vd };
+  assert.throws(() => vm.runInContext("validateExercise(invalidRow)", context), /Valeurs incohérentes/);
+  context.invalidRow = { ...source, umax: 0 };
   assert.throws(() => vm.runInContext("validateExercise(invalidRow)", context), /Valeurs incohérentes/);
 });
 

@@ -61,10 +61,14 @@ function exercise(level,bankSeed,index,used,wave="sinus"){
     let od=pick(r,q.o),limit=3.75-ad,step=divisionStep(level);
     od=Math.round(clamp(od,-limit,limit)/step)*step;
     if(level==="hard"&&od===0)continue;
-    const vertical=maximizeVertical(level,vi,ad,od),key=[vertical.vi,ti,vertical.ad,vertical.od,pd,ph].join("|");
+    const vertical=maximizeVertical(level,vi,ad,od);
+    // Un sommet nul ou négatif n'est pas exploitable pour la lecture de Umax.
+    const peakSteps=Math.round(vertical.ad/step)+Math.round(vertical.od/step);
+    if(peakSteps<=0)continue;
+    const key=[vertical.vi,ti,vertical.ad,vertical.od,pd,ph].join("|");
     if(used.has(key))continue;used.add(key);
     const td=TDIV[ti],T=pd*td;
-    return{wave,level,seed,...vertical,ti,td,pd,ph,umax:vertical.um+vertical.umoy,upp:2*vertical.um,T,f:1/T};
+    return{wave,level,seed,...vertical,ti,td,pd,ph,umax:(vertical.ad+vertical.od)*vertical.vd,upp:2*vertical.um,T,f:1/T};
   }
   throw new Error(`Pas assez de combinaisons uniques pour ${level}.`);
 }
@@ -124,7 +128,7 @@ function validateExercise(e){
   const square=e.wave==="carre"&&e.ad>0&&e.highDiv===-e.lowDiv&&e.highDiv===e.ad&&e.ad<=DIV_Y/2-SQUARE_MARGIN_DIV+1e-9&&
     SQUARE_START_DIV+e.pd<=DIV_X-1+1e-9&&
     e.D>0&&e.D<100&&onGrid(e.hd)&&close(e.umax,e.highDiv*e.vd)&&close(e.hd,e.pd*e.D/100)&&close(e.th,e.hd*e.td);
-  const other=e.wave!=="carre"&&Math.abs(e.od)+e.ad<=DIV_Y/2+1e-9&&
+  const other=e.wave!=="carre"&&e.umax>0&&Math.abs(e.od)+e.ad<=DIV_Y/2+1e-9&&
     onGrid(e.od)&&close(e.umoy,e.od*e.vd)&&close(e.umax,(e.od+e.ad)*e.vd);
   if(!common||!(square||other)){
     throw new Error(`Valeurs incohérentes pour ${e.id||e.seed}.`);
@@ -154,7 +158,7 @@ async function moodleXml(rows,level,wave="sinus"){
   const parts=['<?xml version="1.0" encoding="UTF-8"?>','<quiz>',`<question type="category"><category><text>${category}</text></category></question>`];
   for(const r of rows){
     const imageName=r.id+".webp",base64=await blobBase64(r.webp);
-    const tolUmax=r.umax===0?r.vd*.1:Math.abs(r.umax)*.05,tolT=Math.abs(r.T)*.05,tolF=Math.abs(r.f)*.05;
+    const tolUmax=r.umax*.05,tolT=Math.abs(r.T)*.05,tolF=Math.abs(r.f)*.05;
     const values=wave==="carre"?
       [["Umax (V)",r.umax,tolUmax],["T (s)",r.T,tolT],["f (Hz)",r.f,tolF],["D (%)",r.D,r.D*.05]]:
       [["Umax (V)",r.umax,tolUmax],["Umoy (V)",r.umoy,r.umoy===0?r.vd*.1:Math.abs(r.umoy)*.05],["T (s)",r.T,tolT],["f (Hz)",r.f,tolF]];
